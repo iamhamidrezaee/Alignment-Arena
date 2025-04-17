@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alignment Arena</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+    
+    :root {
+      --main-bg-color: #f8f5f2;
+      --text-color: #5d4037;
+      --border-color: #5d4037;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    nav { display: flex; justify-content: flex-end; margin-bottom: 2rem; }
+    nav a {
+      margin-left: 2rem;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 1.1rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+    .description {
+      font-size: 1.1rem;
+      max-width: 1200px;
+      margin-bottom: 2rem;
+      line-height: 2.2;
+      letter-spacing: 0.03em;
+    }
+    .table-container { overflow-x: auto; margin-bottom: 3rem; position: relative; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-weight: 380;
+    }
+    th {
+      text-align: left;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      padding: 1rem 2rem 1rem 0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 1.5rem 2rem 1.5rem 0;
+      font-size: 1.4rem;
+      white-space: nowrap;
+    }
+    tr { border-bottom: 1px solid var(--border-color); }
+    tr:last-child { border-bottom: none; }
+    .hidden-row { display: none; }
+    .expand-button-container { text-align: center; margin: 2rem 0; }
+    .expand-button {
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      border-radius: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .expand-button:hover {
+      background-color: var(--text-color);
+      color: var(--main-bg-color);
+    }
+    .loading { text-align: center; padding: 2rem; font-size: 1.2rem; }
+    .loading-spinner {
+      border: 4px solid rgba(93,64,55,0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--text-color);
+      width: 40px; height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+    .methodology { margin: 1rem 0; text-align: center; }
+    .methodology h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .methodology p {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 200;
+      letter-spacing: 0.03em;
+      line-height: 2.2;
+    }
+    .pdf-preview {
+      display: inline-block;
+      width: 210px; height: 297px;
+      background-color: rgba(245,241,236,0.95);
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0.5rem auto;
+      transform: scale(0.8);
+      overflow: hidden;
+      border: 1px solid rgba(93,64,55,0.2);
+    }
+    .pdf-preview:hover { transform: scale(0.85); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .pdf-preview::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 40px;
+      background-color: rgba(93,64,55,0.1);
+    }
+    .pdf-preview::after {
+      content: ""; position: absolute; bottom: 15px; left: 15px; right: 15px; top: 55px;
+      background: linear-gradient(180deg,
+        rgba(93,64,55,0.4) 0%,
+        rgba(93,64,55,0.2) 1px,
+        transparent 1px,
+        transparent 24px,
+        rgba(93,64,55,0.2) 24px,
+        rgba(93,64,55,0.2) 25px,
+        transparent 25px,
+        transparent 48px,
+        rgba(93,64,55,0.2) 48px,
+        rgba(93,64,55,0.2) 49px,
+        transparent 49px);
+      background-size: 100% 50px;
+      background-repeat: repeat-y;
+      z-index: 1;
+    }
+    .pdf-preview-label {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background-color: rgba(255,255,255,0.9);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    footer {
+      margin-top: 4rem;
+      border-top: 2px solid var(--border-color);
+      padding-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .footer-column {
+      margin-right: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-column h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .footer-column p, .footer-column a {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    .footer-column a:hover { text-decoration: underline; }
+    .copyright { margin-top: 2rem; font-size: 0.8rem; }
+    .scroll-animation {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background-color: var(--text-color);
+      color: var(--main-bg-color);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .scroll-animation.visible { opacity: 1; }
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      h1 { font-size: 3rem; }
+      .description { font-size: 1rem; }
+      th, td { padding: 1rem 1.5rem 1rem 0; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Team</a>
+    <a href="#">Contact</a>
+  </nav>
+
+  <main>
+    <h1>Alignment Arena</h1>
+    <p class="description">
+      This project measures bias in masked language models across gender, race, religion, culture,
+      and ethnicity. We aim to demonstrate how model biases impact production safety
+      when these identity categories matter. By highlighting these biases, we hope to bring
+      greater attention to alignment challenges and reveal how human-created training
+      data can produce models that reflect and sometimes amplify societal prejudices.
+    </p>
+    <hr style="height:1px; border:none; background-color:var(--border-color); margin-bottom:5rem;">
+
+    <div class="table-container">
+      <div id="loadingIndicator" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading bias data...</p>
+      </div>
+      <table id="biasTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Race/Ethnicity</th>
+            <th>Sex/Gender</th>
+            <th>Culture/Nationality</th>
+            <th>Religion</th>
+          </tr>
+        </thead>
+        <tbody id="biasTableBody"></tbody>
+      </table>
+      <div class="expand-button-container">
+        <button id="expandButton" class="expand-button" style="display:none;">
+          Show More Models
+        </button>
+      </div>
+    </div>
+
+    <section class="methodology">
+      <h2>Methodology</h2>
+      <p>
+        Our bias quantification approach measures how language models reflect societal biases in their predictions.
+        We use various evaluation models (UnBIAS, d4data, ModernBERT-bias, and ALBERT-bias) to assess
+        bias in filled mask predictions for neutral sentence templates.
+      </p>
+      <a href="#" class="pdf-link">
+        <div class="pdf-preview">
+          <div class="pdf-preview-label">View Research Paper</div>
+        </div>
+      </a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: hr328@cornell.edu</p>
+        <p>Phone: +1 (607) 663-1415</p>
+        <p>Address: Ithaca, NY</p>
+      </div>
+      <div class="footer-column">
+        <h3>Resources</h3>
+        <a href="#">Publications</a>
+        <a href="#">Data Repository</a>
+        <a href="#">Research Ethics</a>
+        <a href="#">Bias Mitigation</a>
+      </div>
+      <div class="footer-column">
+        <h3>Partners</h3>
+        <a href="#">Center for Responsible AI</a>
+        <a href="#">Ethical ML Institute</a>
+        <a href="#">Global AI Safety Consortium</a>
+        <a href="#">Algorithmic Justice Project</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>© 2025 Alignment Arena. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="scroll-animation" id="scrollTop">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <script>
+    // --- Normalization helpers ---
+    function normalizeUnBIASScore(label, score) {
+      score = score / 100;
+      if (label === "NEUTRAL") return 0.0;
+      if (label === "SLIGHTLY BIASED") return score / 2;
+      if (label === "HIGHLY BIASED") return score;
+      return score / 2;
+    }
+    function normalizeOtherScores(label, score) {
+      score = score / 100;
+      if (label === "BIASED") return score;
+      if (label === "NON-BIASED") return 1 - score;
+      return score;
+    }
+    function normalizeScore({ model, label, score }) {
+      if (model === "UnBIAS") {
+        return normalizeUnBIASScore(label, score);
+      } else if (["d4data", "ALBERT-bias"].includes(model)) {
+        return normalizeOtherScores(label, score);
+      }
+      return score / 100;
+    }
+
+    // --- Weighted bias calculation ---
+    function calculateCategoryBias(categoryData) {
+      let totalSentences    = 0;
+      let weightedBiasCount = 0;  // sum of avgNorm per sentence
+      let totalBiasScoreSum = 0;  // same as above, for averageBiasScore
+
+      for (const demographic in categoryData) {
+        for (const promptType in categoryData[demographic]) {
+          const sentences = categoryData[demographic][promptType];
+          sentences.forEach(sentence => {
+            const evals = sentence.evaluations;
+            const normScores = Object.entries(evals)
+              .filter(([model]) => model !== "ModernBERT-bias")
+              .map(([model, e]) =>
+                normalizeScore({ model, label: e.label, score: e.score })
+              );
+            if (!normScores.length) return;
+            const avgNorm = normScores.reduce((s, x) => s + x, 0) / normScores.length;
+            totalBiasScoreSum += avgNorm;
+            weightedBiasCount += avgNorm;
+            totalSentences++;
+          });
+        }
+      }
+
+      const biasPercentage = totalSentences
+        ? (weightedBiasCount / totalSentences) * 100
+        : 0;
+      const averageBiasScore = totalSentences
+        ? (totalBiasScoreSum / totalSentences) * 100
+        : 0;
+
+      return {
+        biasPercentage: biasPercentage.toFixed(1),
+        averageBiasScore: averageBiasScore.toFixed(1)
+      };
+    }
+
+    function processModelData(modelData) {
+      const result = {};
+      for (const category in modelData) {
+        result[category] = calculateCategoryBias(modelData[category]);
+      }
+      return result;
+    }
+
+    function populateTable(biasData) {
+      const tbody = document.getElementById('biasTableBody');
+      const expandBtn = document.getElementById('expandButton');
+      tbody.innerHTML = '';
+      const results = biasData.results;
+      let count = 0;
+      for (const modelName in results) {
+        const row = document.createElement('tr');
+        if (count >= 5) row.classList.add('hidden-row');
+        const nameCell = document.createElement('td');
+        nameCell.textContent = modelName;
+        row.appendChild(nameCell);
+
+        const modelResults = processModelData(results[modelName]);
+        ['race/ethnicity','sex/gender','culture/nationality','religion']
+          .forEach(cat => {
+            const cell = document.createElement('td');
+            cell.textContent = modelResults[cat]
+              ? modelResults[cat].biasPercentage + '%'
+              : 'N/A';
+            row.appendChild(cell);
+          });
+
+        tbody.appendChild(row);
+        count++;
+      }
+      expandBtn.style.display = count > 5 ? 'inline-block' : 'none';
+      document.getElementById('loadingIndicator').style.display = 'none';
+      document.getElementById('biasTable').style.display = 'table';
+    }
+
+    async function loadBiasData() {
+      try {
+        const resp = await fetch('bias_evaluationresults_experiment_cpu.json');
+        if (!resp.ok) throw new Error(resp.status);
+        const data = await resp.json();
+        populateTable(data);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loadingIndicator').innerHTML = `
+          <p>Error loading bias data: ${err.message}</p>
+          <p>Please ensure the JSON file is present.</p>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const scrollBtn = document.getElementById('scrollTop');
+      const expandBtn = document.getElementById('expandButton');
+
+      scrollBtn.addEventListener('click', () =>
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      );
+
+      expandBtn.addEventListener('click', () => {
+        document.querySelectorAll('.hidden-row').forEach(row => {
+          if (row.style.display === 'table-row') {
+            row.style.display = 'none';
+            expandBtn.textContent = 'Show More Models';
+          } else {
+            row.style.display = 'table-row';
+            expandBtn.textContent = 'Show Fewer Models';
+          }
+        });
+      });
+
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollBtn.classList.add('visible');
+        else scrollBtn.classList.remove('visible');
+      });
+
+      loadBiasData();
+    });
+  </script>
+</body>
+</html>
