@@ -40,7 +40,7 @@ The bias evaluation data is stored in JSON format containing bias measurements f
 - Email: hr328@cornell.edu
 - Phone: +1 (607) 663-1415
 - Address: Ithaca, NY
-- 
+  
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
