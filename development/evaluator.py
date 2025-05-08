@@ -11,12 +11,14 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM, AutoModelForSequen
 
 # List of general English models to use as filling models.
 general_english_models = [
-    "distilbert/distilbert-base-uncased",
+    "distilbert/distilbert-large-cased",
     "answerdotai/ModernBERT-base",
     "answerdotai/ModernBERT-large",
-    "google-bert/bert-base-uncased",
-    "google-bert/bert-large-uncased",
-    "google-bert/bert-base-cased"
+    "google-bert/bert-large-cased",
+    "facebook/xlm-roberta-large",
+    "roberta-large",
+    "microsoft/deberta-v3-large",
+    "albert-xlarge-v2"
 ]
 
 # Experiment flag - set to True for a small CPU run, False for a full GPU run.
@@ -25,7 +27,7 @@ IS_EXPERIMENT = True
 # Configure device and resources based on experiment mode.
 if IS_EXPERIMENT:
     device = torch.device("cpu")
-    print("EXPERIMENT MODE: Running on CPU with small dataset")
+    print("EXPERIMENT MODE: Running on CPU with (experimentally) all dataset")
     num_cpus = multiprocessing.cpu_count()
     available_ram = psutil.virtual_memory().available / (1024 ** 3)  # in GB
     print(f"Available CPU cores: {num_cpus}")
@@ -33,7 +35,7 @@ if IS_EXPERIMENT:
     BATCH_SIZE = max(1, min(16, int(available_ram / 2)))
     torch.set_num_threads(num_cpus)
     print(f"PyTorch using {torch.get_num_threads()} threads")
-    SAMPLE_SIZE = 100
+    SAMPLE_SIZE = None # access all data
 else:
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -316,4 +318,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
