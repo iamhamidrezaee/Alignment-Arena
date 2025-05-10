@@ -320,97 +320,206 @@
       } else if (["d4data", "ALBERT-bias"].includes(model)) {
         return normalizeOtherScores(label, score);
       }
-      return score / 100;
+      // For models like ModernBERT-bias or others not explicitly handled,
+      // we return the score directly (divided by 100 if it's a percentage)
+      // or handle as per requirements. The current logic assumes it's already a comparable metric
+      // or should be ignored by the filter in calculateCategoryBias.
+      // The original code effectively ignores ModernBERT-bias in normScores.
+      return score / 100; 
     }
 
     // --- Weighted bias calculation ---
     function calculateCategoryBias(categoryData) {
       let totalSentences    = 0;
       let weightedBiasCount = 0;  // sum of avgNorm per sentence
-      let totalBiasScoreSum = 0;  // same as above, for averageBiasScore
+      let totalBiasScoreSum = 0;  // same as above, effectively
 
       for (const demographic in categoryData) {
-        for (const promptType in categoryData[demographic]) {
-          const sentences = categoryData[demographic][promptType];
-          sentences.forEach(sentence => {
-            const evals = sentence.evaluations;
-            const normScores = Object.entries(evals)
-              .filter(([model]) => model !== "ModernBERT-bias")
-              .map(([model, e]) =>
-                normalizeScore({ model, label: e.label, score: e.score })
-              );
-            if (!normScores.length) return;
-            const avgNorm = normScores.reduce((s, x) => s + x, 0) / normScores.length;
-            totalBiasScoreSum += avgNorm;
-            weightedBiasCount += avgNorm;
-            totalSentences++;
-          });
+        if (categoryData.hasOwnProperty(demographic)) {
+          const demographicDetails = categoryData[demographic];
+          for (const promptType in demographicDetails) {
+            if (demographicDetails.hasOwnProperty(promptType)) {
+              const sentences = demographicDetails[promptType];
+              
+              // ---- START OF THE FIX ----
+              if (Array.isArray(sentences)) {
+                sentences.forEach(sentence => {
+                  if (sentence && sentence.evaluations) { // Ensure sentence and evaluations exist
+                    const evals = sentence.evaluations;
+                    const normScores = Object.entries(evals)
+                      .filter(([modelName]) => modelName !== "ModernBERT-bias") // Use modelName for clarity
+                      .map(([modelName, e]) =>
+                        normalizeScore({ model: modelName, label: e.label, score: e.score })
+                      );
+                    
+                    if (normScores.length > 0) { // Ensure there are scores to average
+                      const avgNorm = normScores.reduce((s, x) => s + x, 0) / normScores.length;
+                      totalBiasScoreSum += avgNorm;
+                      weightedBiasCount += avgNorm; 
+                      totalSentences++;
+                    }
+                  } else {
+                    console.warn(`Skipping sentence due to missing data in ${demographic}/${promptType}:`, sentence);
+                  }
+                });
+              } else {
+                console.warn(`Expected 'sentences' to be an array for ${demographic}/${promptType}, but got:`, sentences);
+              }
+              // ---- END OF THE FIX ----
+            }
+          }
         }
       }
 
       const biasPercentage = totalSentences
-        ? (weightedBiasCount / totalSentences) * 100
+        ? (weightedBiasCount / totalSentences) * 100 // weightedBiasCount here represents the sum of average normalized scores.
+                                                     // If it's intended to be a count of 'biased sentences', this logic might need review.
+                                                     // Based on current variable names, it's an average of scores, scaled by 100.
         : 0;
-      const averageBiasScore = totalSentences
+      const averageBiasScore = totalSentences // This is identical to biasPercentage if weightedBiasCount is sum of scores.
         ? (totalBiasScoreSum / totalSentences) * 100
         : 0;
 
+      // Given the variable names, 'averageBiasScore' seems more fitting for what's calculated.
+      // 'biasPercentage' might be misleading if it's not a true percentage of biased items
+      // but rather an average score presented as a percentage.
+      // For now, I'll keep the structure as is, assuming this interpretation is intended.
       return {
-        biasPercentage: biasPercentage.toFixed(1),
+        biasPercentage: averageBiasScore.toFixed(1), // Using averageBiasScore for both for consistency with original logic
         averageBiasScore: averageBiasScore.toFixed(1)
       };
     }
 
-    function processModelData(modelData) {
+    function processModelData(modelBiasDetails) { // modelBiasDetails is results[modelName].results
       const result = {};
-      for (const category in modelData) {
-        result[category] = calculateCategoryBias(modelData[category]);
+      if (modelBiasDetails && typeof modelBiasDetails === 'object') {
+        for (const category in modelBiasDetails) {
+          if (modelBiasDetails.hasOwnProperty(category)) {
+            result[category] = calculateCategoryBias(modelBiasDetails[category]);
+          }
+        }
+      } else {
+        console.warn("Invalid modelBiasDetails passed to processModelData:", modelBiasDetails);
       }
       return result;
     }
 
     function populateTable(biasData) {
-      const tbody = document.getElementById('biasTableBody');
-      const expandBtn = document.getElementById('expandButton');
-      tbody.innerHTML = '';
-      const results = biasData.results;
-      let count = 0;
-      for (const modelName in results) {
-        const row = document.createElement('tr');
-        if (count >= 5) row.classList.add('hidden-row');
-        const nameCell = document.createElement('td');
-        nameCell.textContent = modelName;
-        row.appendChild(nameCell);
+  const tbody = document.getElementById('biasTableBody');
+  const expandBtn = document.getElementById('expandButton');
+  tbody.innerHTML = ''; // Clear previous content
 
-        const modelResults = processModelData(results[modelName]);
-        ['race/ethnicity','sex/gender','culture/nationality','religion']
-          .forEach(cat => {
-            const cell = document.createElement('td');
-            cell.textContent = modelResults[cat]
-              ? modelResults[cat].biasPercentage + '%'
-              : 'N/A';
-            row.appendChild(cell);
-          });
+  if (!biasData || !biasData.results) {
+    document.getElementById('loadingIndicator').innerHTML = '<p>Error: Invalid data format received.</p>';
+    console.error("Invalid biasData:", biasData);
+    return;
+  }
+  
+  const results = biasData.results;
+  let count = 0;
+  const modelNames = Object.keys(results);
 
-        tbody.appendChild(row);
-        count++;
+  if (modelNames.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No model data found in the JSON.</td></tr>';
+    return;
+  }
+
+  // First, find the highest values for each category
+  const highestValues = {
+    'race/ethnicity': -Infinity,
+    'sex/gender': -Infinity,
+    'culture/nationality': -Infinity,
+    'religion': -Infinity
+  };
+
+  // Loop through all models to find highest values in each category
+  for (const modelName in results) {
+    if (results.hasOwnProperty(modelName)) {
+      const modelDetails = results[modelName];
+      let modelProcessedResults = {};
+      if (modelDetails && modelDetails.results) {
+        modelProcessedResults = processModelData(modelDetails.results);
       }
-      expandBtn.style.display = count > 5 ? 'inline-block' : 'none';
-      document.getElementById('loadingIndicator').style.display = 'none';
-      document.getElementById('biasTable').style.display = 'table';
+      
+      ['race/ethnicity','sex/gender','culture/nationality','religion'].forEach(cat => {
+        const categoryResult = modelProcessedResults[cat];
+        if (categoryResult && typeof categoryResult.biasPercentage !== 'undefined') {
+          const biasValue = parseFloat(categoryResult.biasPercentage);
+          if (!isNaN(biasValue) && biasValue > highestValues[cat]) {
+            highestValues[cat] = biasValue;
+          }
+        }
+      });
     }
+  }
+
+  // Now populate the table, bolding the highest values
+  for (const modelName in results) {
+    if (results.hasOwnProperty(modelName)) {
+      const row = document.createElement('tr');
+      if (count >= 5) {
+         row.classList.add('hidden-row');
+         row.style.display = 'none';
+      }
+
+      const nameCell = document.createElement('td');
+      nameCell.textContent = modelName;
+      row.appendChild(nameCell);
+
+      const modelDetails = results[modelName];
+      let modelProcessedResults = {};
+      if (modelDetails && modelDetails.results) {
+         modelProcessedResults = processModelData(modelDetails.results);
+      } else {
+         console.warn(`Missing 'results' for model: ${modelName}`);
+      }
+      
+      ['race/ethnicity','sex/gender','culture/nationality','religion']
+        .forEach(cat => {
+          const cell = document.createElement('td');
+          const categoryResult = modelProcessedResults[cat];
+          if (categoryResult && typeof categoryResult.biasPercentage !== 'undefined') {
+            const biasValue = parseFloat(categoryResult.biasPercentage);
+            cell.textContent = categoryResult.biasPercentage + '%';
+            
+            // Bold the cell if it has the highest value for its category
+            if (!isNaN(biasValue) && biasValue === highestValues[cat]) {
+              cell.style.fontWeight = 'bold';
+            }
+          } else {
+            cell.textContent = 'N/A';
+          }
+          row.appendChild(cell);
+        });
+
+      tbody.appendChild(row);
+      count++;
+    }
+  }
+  
+  expandBtn.style.display = count > 5 ? 'inline-block' : 'none';
+  document.getElementById('loadingIndicator').style.display = 'none';
+  document.getElementById('biasTable').style.display = 'table';
+}
 
     async function loadBiasData() {
       try {
         const resp = await fetch('bias_evaluationresults_experiment_cpu.json');
-        if (!resp.ok) throw new Error(resp.status);
+        if (!resp.ok) {
+            // More specific error for network/HTTP issues
+            throw new Error(`Failed to fetch data: ${resp.status} ${resp.statusText}`);
+        }
         const data = await resp.json();
         populateTable(data);
       } catch (err) {
-        console.error(err);
+        console.error("Error in loadBiasData:", err);
+        let errorMessage = `Error loading bias data: ${err.message}`;
+        if (err instanceof SyntaxError) {
+            errorMessage = "Error loading bias data: The JSON file seems to be malformed.";
+        }
         document.getElementById('loadingIndicator').innerHTML = `
-          <p>Error loading bias data: ${err.message}</p>
-          <p>Please ensure the JSON file is present.</p>
+          <p>${errorMessage}</p>
+          <p>Please ensure the file 'bias_evaluationresults_experiment_cpu.json' is present in the correct location and is valid JSON.</p>
         `;
       }
     }
@@ -419,27 +528,38 @@
       const scrollBtn = document.getElementById('scrollTop');
       const expandBtn = document.getElementById('expandButton');
 
-      scrollBtn.addEventListener('click', () =>
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      );
+      if (scrollBtn) {
+        scrollBtn.addEventListener('click', () =>
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        );
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 300) scrollBtn.classList.add('visible');
+          else scrollBtn.classList.remove('visible');
+        });
+      }
 
-      expandBtn.addEventListener('click', () => {
-        document.querySelectorAll('.hidden-row').forEach(row => {
-          if (row.style.display === 'table-row') {
-            row.style.display = 'none';
+      if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+          let allHidden = true;
+          document.querySelectorAll('#biasTableBody tr.hidden-row').forEach(row => {
+            if (row.style.display === 'none' || !row.style.display) {
+                allHidden = false; // Found at least one row to show
+            }
+          });
+
+          if (allHidden) { // If all were shown, now hide them
+            document.querySelectorAll('#biasTableBody tr.hidden-row').forEach(row => {
+                row.style.display = 'none';
+            });
             expandBtn.textContent = 'Show More Models';
-          } else {
-            row.style.display = 'table-row';
+          } else { // Otherwise, show all hidden ones
+             document.querySelectorAll('#biasTableBody tr.hidden-row').forEach(row => {
+                row.style.display = 'table-row';
+            });
             expandBtn.textContent = 'Show Fewer Models';
           }
         });
-      });
-
-      window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) scrollBtn.classList.add('visible');
-        else scrollBtn.classList.remove('visible');
-      });
-
+      }
       loadBiasData();
     });
   </script>
