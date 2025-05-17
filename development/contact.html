@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | Alignment Arena</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+    
+    :root {
+      --main-bg-color: #f8f5f2;
+      --text-color: #5d4037;
+      --border-color: #5d4037;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    nav { display: flex; justify-content: flex-end; margin-bottom: 2rem; }
+    nav a {
+      margin-left: 2rem;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 1.1rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+    .description {
+      font-size: 1.1rem;
+      max-width: 1200px;
+      margin-bottom: 3rem;
+      line-height: 2.2;
+      letter-spacing: 0.03em;
+    }
+    .contact-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 3rem;
+      margin: 2rem 0 4rem;
+    }
+    .contact-info {
+      flex: 1;
+      min-width: 300px;
+      padding-right: 2rem;
+    }
+    .contact-info h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+    .contact-method {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .contact-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(93,64,55,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 1rem;
+      color: var(--text-color);
+      font-size: 1.2rem;
+    }
+    .contact-details {
+      flex: 1;
+    }
+    .contact-details h3 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    .contact-details p {
+      font-size: 1rem;
+      color: rgba(93,64,55,0.85);
+    }
+    .contact-form {
+      flex: 1;
+      min-width: 300px;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: rgba(93,64,55,0.85);
+    }
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(93,64,55,0.3);
+      background-color: rgba(255,255,255,0.7);
+      border-radius: 0;
+      color: var(--text-color);
+      font-family: 'Montserrat', sans-serif;
+      transition: all 0.3s ease;
+    }
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--text-color);
+      background-color: rgba(255,255,255,0.9);
+    }
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    .submit-button {
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      border-radius: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .submit-button:hover {
+      background-color: var(--text-color);
+      color: var(--main-bg-color);
+    }
+    .location-map {
+      margin-top: 4rem;
+      width: 100%;
+      height: 400px;
+      background-color: rgba(93,64,55,0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(93,64,55,0.1);
+    }
+    .map-placeholder {
+      text-align: center;
+      padding: 1rem;
+    }
+    .map-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: rgba(93,64,55,0.7);
+    }
+    .map-placeholder p {
+      font-size: 1.2rem;
+      color: rgba(93,64,55,0.7);
+    }
+    footer {
+      margin-top: 4rem;
+      border-top: 2px solid var(--border-color);
+      padding-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .footer-column {
+      margin-right: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-column h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .footer-column p, .footer-column a {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    .footer-column a:hover { text-decoration: underline; }
+    .copyright { margin-top: 2rem; font-size: 0.8rem; }
+    .scroll-animation {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background-color: var(--text-color);
+      color: var(--main-bg-color);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .scroll-animation.visible { opacity: 1; }
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      h1 { font-size: 3rem; }
+      .description { font-size: 1rem; }
+      .contact-container { flex-direction: column; }
+      .contact-info { padding-right: 0; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <main>
+    <h1>Contact Us</h1>
+    <p class="description">
+      We welcome inquiries about our research on bias in language models. Whether you're interested in collaboration,
+      have questions about our methodology, or would like to discuss potential applications of our findings,
+      please reach out using the information below.
+    </p>
+    
+    <div class="contact-container">
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-details">
+            <h3>Email</h3>
+            <p>hr328@cornell.edu</p>
+          </div>
+        </div>
+        
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="contact-details">
+            <h3>Phone</h3>
+            <p>+1 (607) 663-1415</p>
+          </div>
+        </div>
+        
+        <div class="contact-method">
+          <div class="contact-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="contact-details">
+            <h3>Location</h3>
+            <p>Cornell University<br>Ithaca, NY 14850</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="footer-content">
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: hr328@cornell.edu</p>
+        <p>Phone: +1 (607) 663-1415</p>
+        <p>Address: Ithaca, NY</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>© 2025 Alignment Arena. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <div class="scroll-animation" id="scrollTop">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const scrollBtn = document.getElementById('scrollTop');
+      scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          scrollBtn.classList.add('visible');
+        } else {
+          scrollBtn.classList.remove('visible');
+        }
+      });
+      
+      document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Here you would normally handle the form submission with AJAX
+        // For demonstration purposes, we'll just show an alert
+        alert('Thank you for your message! We will get back to you soon.');
+        this.reset();
+      });
+    });
+  </script>
+</body>
+</html>

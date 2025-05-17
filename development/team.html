@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team | Alignment Arena</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+    
+    :root {
+      --main-bg-color: #f8f5f2;
+      --text-color: #5d4037;
+      --border-color: #5d4037;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--main-bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    nav { display: flex; justify-content: flex-end; margin-bottom: 2rem; }
+    nav a {
+      margin-left: 2rem;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 1.1rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 400;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+    .description {
+      font-size: 1.1rem;
+      max-width: 1200px;
+      margin-bottom: 3rem;
+      line-height: 2.2;
+      letter-spacing: 0.03em;
+    }
+    .team-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6rem;
+      margin: 3rem 0 4rem;
+    }
+    .team-member {
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .profile-image-container {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(93,64,55,0.2);
+      position: relative;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+    .profile-image-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .profile-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .team-member h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .team-member h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: rgba(93,64,55,0.85);
+    }
+    .team-member p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-color);
+      max-width: 380px;
+    }
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .social-links a {
+      color: var(--text-color);
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+    .social-links a:hover {
+      transform: translateY(-3px);
+    }
+    footer {
+      margin-top: 4rem;
+      border-top: 2px solid var(--border-color);
+      padding-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .footer-column {
+      margin-right: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-column h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .footer-column p, .footer-column a {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    .footer-column a:hover { text-decoration: underline; }
+    .copyright { margin-top: 2rem; font-size: 0.8rem; }
+    .scroll-animation {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background-color: var(--text-color);
+      color: var(--main-bg-color);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .scroll-animation.visible { opacity: 1; }
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      h1 { font-size: 3rem; }
+      .description { font-size: 1rem; }
+      .team-container { gap: 3rem; }
+      .profile-image-container { width: 220px; height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="team.html">Team</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <main>
+    <h1>Our Team</h1>
+    <p class="description">
+      The Alignment Arena project brings together researchers focused on understanding and measuring bias in masked language models.
+      Our interdisciplinary approach combines expertise in natural language processing and computational linguistics to evaluate how models reflect societal biases.
+    </p>
+    
+    <div class="team-container">
+      <div class="team-member">
+        <div class="profile-image-container">
+          <img src="hamid_profile.jpg" alt="Hamid Profile" class="profile-image">
+        </div>
+        <h2>Hamid Rezaee</h2>
+        <h3>Lead Researcher</h3>
+        <p>Specializing in machine learning, Hamid's work focuses on advanced NLP, predictive modeling, and applied language modeling.</p>
+        <div class="social-links">
+          <a href="https://github.com/iamhamidrezaee" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="https://www.linkedin.com/in/iamhamidrezaee/" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+      
+      <div class="team-member">
+        <div class="profile-image-container">
+          <img src="matthew_wilkens_profile.jpg" alt="Matthew Wilkens Profile" class="profile-image">
+        </div>
+        <h2>Matthew Wilkens</h2>
+        <h3>Advisor</h3>
+        <p>Professor Wilkens is associate professor of information science at Cornell University. He uses quantitative and computational methods to study large-scale developments in literary and cultural history.</p>
+        <div class="social-links">
+          <a href="https://mattwilkens.com/" aria-label="Personal Website" target="_blank"><i class="fas fa-globe"></i></a>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="footer-content">
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: hr328@cornell.edu</p>
+        <p>Phone: +1 (607) 663-1415</p>
+        <p>Address: Ithaca, NY</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>© 2025 Alignment Arena. All rights reserved.</p>
+    </div>
+  </footer>
+  
+  <div class="scroll-animation" id="scrollTop">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const scrollBtn = document.getElementById('scrollTop');
+      scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          scrollBtn.classList.add('visible');
+        } else {
+          scrollBtn.classList.remove('visible');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
