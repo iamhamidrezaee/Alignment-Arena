@@ -9,8 +9,6 @@ Alignment Arena is a novel framework for quantifying and comparing alignment in 
 
 Our project measures how language models reflect societal biases in their predictions, demonstrating how model biases impact production safety when identity categories matter. By highlighting these biases, we bring greater attention to alignment challenges and reveal how human-created training data can produce models that reflect and sometimes amplify societal prejudices.
 
-[![Paper](https://img.shields.io/badge/Paper-Read-green)](Alignment_Arena.pdf)
-
 ## Key Contributions
 
 - **Comprehensive Evaluation Dataset**: The first to span such a wide array of social dimensions for MLM bias probing
