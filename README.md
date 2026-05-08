@@ -62,10 +62,7 @@ The Alignment Arena web platform provides:
 
 ## Contact
 
-- **Email**: [hr328@cornell.edu](mailto:hr328@cornell.edu)
-- **Phone**: +1 (607) 663-1415
-- **Address**: Cornell University, Ithaca, NY
-
+For project questions, use the repository issues page or the email listed in the team section.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
